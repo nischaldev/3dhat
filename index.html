@@ -102,12 +102,10 @@ scene.add(insideLight);
                 const box = new THREE.Box3().setFromObject(hatModel);
                 const size = box.getSize(new THREE.Vector3());
                 const center = box.getCenter(new THREE.Vector3());
-                hatModel.position.y = 5;
-                hatModel.position.x = 1;
-
+                 hatModel.position.sub(center);
                 // Initial camera position
                 //camera.position.set(0, 0, 8);
-                camera.position.set(0, 0, 30); 
+                camera.position.set(0, 0, 10); 
 
                 // Animate the initial model rotation
                 animateModel();
