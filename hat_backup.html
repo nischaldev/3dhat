@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Hat Generator</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
+        canvas { display: block; }
+        #controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: sans-serif;
+            z-index: 10;
+        }
+        .fabric-option {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .fabric-option.active {
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <h3>Outside Fabric</h3>
+        <div id="fabric-buttons">
+            </div>
+
+        <h3>Inside Fabric</h3>
+        <div id="inside-fabric-buttons">
+            </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add OrbitControls for user interaction
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; // Smooth rotation
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
+
+        // GLB Model Loading
+        const loader = new GLTFLoader();
+        let hatModel; // This will hold our loaded model
+
+        // Load the GLB file
+        loader.load(
+            'hat.glb', // REPLACE WITH YOUR GLB FILE PATH
+            function (gltf) {
+                hatModel = gltf.scene;
+                scene.add(hatModel);
+
+                // Center the model in the scene
+                const box = new THREE.Box3().setFromObject(hatModel);
+                const center = box.getCenter(new THREE.Vector3());
+                hatModel.position.sub(center);
+
+                // Initial camera position
+                camera.position.set(0, 0, 3);
+
+                // Animate the initial model rotation
+                animateModel();
+
+            },
+            // Called while loading is progressing
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+            },
+            // Called if there's an error
+            function (error) {
+                console.error('An error happened', error);
+            }
+        );
+
+        // Texture Loading and Selection
+        const textureLoader = new THREE.TextureLoader();
+
+let fabrics = [
+  {
+    name: 'Fabric 1',
+    path: 'https://boomconcole.com/freeschema/f47e1cfb-7ef0-48f3-a9ba-3f4e6bb1344c.jpg',
+  }, // REPLACE
+  {
+    name: 'Fabric 2',
+    path: 'https://boomconcole.com/freeschema/5493481b-be07-4eb6-88ba-65512f5f96d4.jpg',
+  }, // REPLACE
+  {
+    name: 'Fabric 3',
+    path: 'https://boomconcole.com/freeschema/614fb833-ebee-4972-b91d-6b2a1be03279.jpg',
+  },
+];
+
+        const insideFabrics = [
+            { name: 'Fabric 1', path: 'https://boomconcole.com/freeschema/f47e1cfb-7ef0-48f3-a9ba-3f4e6bb1344c.jpg' }, // REPLACE
+            { name: 'Fabric 2', path: 'https://boomconcole.com/freeschema/5493481b-be07-4eb6-88ba-65512f5f96d4.jpg' }, // REPLACE
+            { name: 'Fabric 3', path: 'https://boomconcole.com/freeschema/614fb833-ebee-4972-b91d-6b2a1be03279.jpg' }  // REPLACE
+        ];
+
+        const fabricButtonsContainer = document.getElementById('fabric-buttons');
+
+        const insideFabricButtonsContainer = document.getElementById('inside-fabric-buttons');
+
+        function applyTexture(texturePath, childName) {
+            console.log("this is the texture", texturePath);
+            textureLoader.load(texturePath, (texture) => {
+                texture.colorSpace = THREE.SRGBColorSpace; // Correct color space for standard textures
+                if (hatModel) {
+                    // Traverse the model to find the specific mesh to change
+                    hatModel.traverse((child) => {
+                        if (child.isMesh) {
+                            console.log("this is mesh", texture, child.name, childName);
+                            // Find the correct mesh by name (e.g., "Hat_Mesh"). You'll need to check your GLB file.
+                            if (child.name === childName) { // REPLACE WITH THE NAME OF YOUR HAT MESH
+                                console.log("this is the texture change",child.name);
+                                child.material.map = texture;
+                                child.material.needsUpdate = true;
+
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // Create fabric selection buttons
+        fabrics.forEach(fabric => {
+            const button = document.createElement('img');
+            button.src = fabric.path;
+            button.alt = fabric.name;
+            button.className = 'fabric-option';
+            button.title = fabric.name;
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.fabric-option').forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+                applyTexture(fabric.path, 'Object_2');
+            });
+            fabricButtonsContainer.appendChild(button);
+        });
+
+        insideFabrics.forEach(fabric => {
+            const button = document.createElement('img');
+            button.src = fabric.path;
+            button.alt = fabric.name;
+            button.className = 'fabric-option';
+            button.title = fabric.name;
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.fabric-option').forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+                applyTexture(fabric.path, 'Object_3');
+                applyTexture(fabric.path, 'Object_4');
+                applyTexture(fabric.path, 'Object_5');
+                applyTexture(fabric.path, 'Object_6');
+            });
+            insideFabricButtonsContainer.appendChild(button);
+        });
+
+        // Set initial fabric
+        if (fabrics.length > 0) {
+            applyTexture(fabrics[0].path);
+            document.querySelector('.fabric-option').classList.add('active');
+        }
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Only required if controls.enableDamping is set to true
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Optional: Animate the model's rotation once it's loaded
+        function animateModel() {
+            if (hatModel) {
+                hatModel.rotation.y += 0.005;
+            }
+            requestAnimationFrame(animateModel);
+        }
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+
+</body>
+</html>
