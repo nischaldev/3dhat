@@ -48,7 +48,7 @@
         let messageData = null;
         // Scene setup
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 
 
@@ -102,15 +102,12 @@ scene.add(insideLight);
                 const box = new THREE.Box3().setFromObject(hatModel);
                 const size = box.getSize(new THREE.Vector3());
                 const center = box.getCenter(new THREE.Vector3());
-                hatModel.position.sub(center);
-
-                const maxSize = Math.max(size.x, size.y, size.z);
-                const fov = camera.fov * (Math.PI / 180);
-                const cameraZ = Math.abs(maxSize / 2 / Math.tan(fov / 2));
+                hatModel.position.y = 5;
+                hatModel.position.x = 1;
 
                 // Initial camera position
                 //camera.position.set(0, 0, 8);
-                camera.position.set(center.x, center.y, center.z + cameraZ * 3); 
+                camera.position.set(0, 0, 30); 
 
                 // Animate the initial model rotation
                 animateModel();
@@ -233,7 +230,7 @@ scene.add(insideLight);
             fabrics = message.data?.fabrics;
             let firstFabric = fabrics[0];
             let secondFabric = fabrics[1];
-            console.log("applying the texture");
+            let sizes = message.data?.sizes;
             applyTexture(firstFabric.path, 'Cone', firstFabric.fabricType)
             applyTexture(secondFabric.path, 'Cylinder',secondFabric.fabricType)
         }
