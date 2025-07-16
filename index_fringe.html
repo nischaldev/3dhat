@@ -93,7 +93,7 @@
 
         // Load the GLB file
         await loader.load(
-            'hat_fringe_v1.glb', // REPLACE WITH YOUR GLB FILE PATH
+            'hat_fringe_v4glb.glb', // REPLACE WITH YOUR GLB FILE PATH
             function (gltf) {
                 hatModel = gltf.scene;
 
@@ -166,7 +166,7 @@
                     console.log("this is the inside fabric");
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set(2, 2);
+                    texture.repeat.set(1, 10);
                 }
 
                 if (hatModel) {
