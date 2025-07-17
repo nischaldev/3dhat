@@ -173,6 +173,7 @@
                     // Traverse the model to find the specific mesh to change
                     hatModel.traverse((child) => {
                         if (child.isMesh) {
+                            console.log("this is the child", child.name, childName);
                             // Find the correct mesh by name (e.g., "Hat_Mesh"). You'll need to check your GLB file.
                             if (child.name === childName) { // REPLACE WITH THE NAME OF YOUR HAT MESH
                                 child.material = child.material.clone();
