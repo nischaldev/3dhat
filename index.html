@@ -93,7 +93,7 @@
 
         // Load the GLB file
         await loader.load(
-            'hat_uv_v1.glb', // REPLACE WITH YOUR GLB FILE PATH
+            'beanie2.glb', // REPLACE WITH YOUR GLB FILE PATH
             function (gltf) {
                 hatModel = gltf.scene;
 
@@ -229,8 +229,8 @@
             let firstFabric = fabrics[0];
             let secondFabric = fabrics[1];
             let sizes = message.data?.sizes;
-            applyTexture(firstFabric.path, 'Cone', firstFabric.fabricType)
-            applyTexture(secondFabric.path, 'Cylinder',secondFabric.fabricType)
+            applyTexture(firstFabric.path, 'Circle', firstFabric.fabricType)
+            applyTexture(secondFabric.path, 'Circle_2',secondFabric.fabricType)
         }
         
         window.addEventListener('message', (message) => {
