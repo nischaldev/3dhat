@@ -93,7 +93,7 @@
 
         // Load the GLB file
         await loader.load(
-            'hat_uv_v1.glb', // REPLACE WITH YOUR GLB FILE PATH
+            'v9.glb', // REPLACE WITH YOUR GLB FILE PATH
             function (gltf) {
                 hatModel = gltf.scene;
 
@@ -173,6 +173,7 @@
                     // Traverse the model to find the specific mesh to change
                     hatModel.traverse((child) => {
                         if (child.isMesh) {
+                            console.log("child", child.name, childName)
                             // Find the correct mesh by name (e.g., "Hat_Mesh"). You'll need to check your GLB file.
                             if (child.name === childName) { // REPLACE WITH THE NAME OF YOUR HAT MESH
                                 child.material = child.material.clone();
@@ -229,8 +230,9 @@
             let firstFabric = fabrics[0];
             let secondFabric = fabrics[1];
             let sizes = message.data?.sizes;
-            applyTexture(firstFabric.path, 'Cone', firstFabric.fabricType)
-            applyTexture(secondFabric.path, 'Cylinder',secondFabric.fabricType)
+            applyTexture(firstFabric.path, 'main',firstFabric.fabricType)
+            applyTexture(firstFabric.path, 'x',firstFabric.fabricType)
+            applyTexture(firstFabric.path, 'x-symmetric',firstFabric.fabricType)
         }
         
         window.addEventListener('message', (message) => {
